@@ -2498,6 +2498,8 @@ public class ContactsProvider2 extends AbstractContactsProvider
                     "Cannot set default account with non-null data set.");
         }
 
+        final Bundle response = new Bundle();
+
         AccountWithDataSet accountWithDataSet = new AccountWithDataSet(
                 accountName, accountType, dataSet);
         Account[] systemAccounts = AccountManager.get(getContext()).getAccounts();
@@ -2505,11 +2507,10 @@ public class ContactsProvider2 extends AbstractContactsProvider
         if (!accountWithDataSet.isLocalAccount()
                 && !accountWithDataSet.inSystemAccounts(systemAccounts)
                 && !accountWithDataSet.inSimAccounts(simAccounts)) {
-            throw new IllegalArgumentException(
-                    "Cannot set default account for invalid accounts.");
+            Log.e(TAG, "Cannot set default account for invalid account: " + accountWithDataSet);
+            return response;
         }
 
-        final Bundle response = new Bundle();
         final SQLiteDatabase db = mDbHelper.get().getWritableDatabase();
         db.beginTransaction();
         try {
@@ -2518,6 +2519,7 @@ public class ContactsProvider2 extends AbstractContactsProvider
         } finally {
             db.endTransaction();
         }
+
         return response;
     }
 
